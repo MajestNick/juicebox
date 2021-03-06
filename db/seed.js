@@ -119,7 +119,7 @@ const {
 
   async function createTags(tagList) {
     if (tagList.length === 0) { 
-      return; 
+      return []; 
     }
   
     // need something like: $1), ($2), ($3 
@@ -133,11 +133,13 @@ const {
     // then we can use (${ selectValues }) in our string template
   
     try {
+        
       // insert the tags, doing nothing on conflict
       // returning nothing, we'll query after
   
       // select all tags where the name is in our taglist
       // return the rows from the query
+      return;
     } catch (error) {
       throw error;
     }
@@ -232,6 +234,32 @@ const {
       throw error;
     }
   }
+
+  async function createInitialTags() {
+    try {
+      console.log("Starting to create tags...");
+  
+      const [happy, sad, inspo, catman] = await createTags([
+        '#happy', 
+        '#worst-day-ever', 
+        '#youcandoanything',
+        '#catmandoeverything'
+      ]);
+      console.log("Is still alive")
+      const [postOne, postTwo, postThree] = await getAllPosts();
+      console.log("tags are still alive")
+      await addTagsToPost(postOne.id, [happy, inspo]);
+      console.log("aaaaa")
+      await addTagsToPost(postTwo.id, [sad, inspo]);
+      console.log("bbbbb")
+      await addTagsToPost(postThree.id, [happy, catman, inspo]);
+
+      console.log("Finished creating tags!");
+    } catch (error) {
+      console.log("Error creating tags!");
+      throw error;
+    }
+  }
   
   async function rebuildDB() {
     try {
@@ -241,6 +269,7 @@ const {
       await createTables();
       await createInitialUsers();
       await createInitialPosts();
+      await createInitialTags(); // new
     } catch (error) {
       console.log("Error during rebuildDB")
       throw error;
